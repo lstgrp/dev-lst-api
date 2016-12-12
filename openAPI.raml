@@ -1,0 +1,283 @@
+#%RAML 0.8
+
+title: Open API
+version: v0.1
+
+# devBaseUri: 52.78.215.175:1337
+# prodBaseUri: 52.78.234.239:1337
+
+/signup:
+  post:
+    description: Sign up with id and password
+    body:
+      application/json:
+        schema: |
+          {
+            "type": "object",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "required": true,
+            "properties": {
+              "userId": {
+                "type": "string",
+                "required": true
+              },
+              "password": {
+                "type": "string",
+                "required": true
+              }
+            }
+          }
+        example: |
+          {
+            "userId": "asdf@asdf.com",
+            "password": "1234"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "ok"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "fail",
+                "message": "duplicate id"
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "fail",
+                "message": "Internal error"
+              }
+/login:
+  post:
+    description: Login with id and password
+    body:
+      application/json:
+        schema: |
+          {
+            "type": "object",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "required": true,
+            "properties": {
+              "userId": {
+                "type": "string",
+                "required": true
+              },
+              "password": {
+                "type": "string",
+                "required": true
+              },
+              "appId": {
+                "type": "string",
+                "required": false
+              },
+              "deviceId": {
+                "type": "array",
+                "required": false,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        example: |
+          {
+            "userId": "asdf@asdf.com",
+            "password": "1234",
+            "appId": "app-id",
+            "deviceId": ["device-id-1", "device-id-2"]
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "ok",
+                "token": "longstring",
+                "ttl": 3600
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "fail",
+                "message": "Invalid password"
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "fail",
+                "message": "Internal error"
+              }
+  /guest:
+    post:
+      description: Login as guest
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "ok",
+                  "token": "longstring",
+                  "ttl": 3600
+                }
+        500:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "fail",
+                  "message": "Internal error"
+                }
+/logout:
+  post:
+    description: Logout of current session
+    headers:
+      x-api-key:
+        example: longlongstring
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "ok"
+              }
+      500:
+        body:
+          application/json:
+            example: |
+              {
+                "status": "fail",
+                "message": "Internal error"
+              }
+/register:
+  /device:
+    post:
+      description: Register device
+      headers:
+        x-api-key:
+          example: longlongstring
+      body:
+        application/json:
+          schema: |
+            {
+              "type": "object",
+              "$schema": "http://json-schema.org/draft-03/schema",
+              "required": true,
+              "properties": {
+                "serial": {
+                  "type": "string",
+                  "required": true
+                },
+                "model": {
+                  "type": "string",
+                  "required": true
+                },
+                "fw": {
+                  "type": "string",
+                  "required": true
+                }
+              }
+            }
+          example: |
+            {
+              "serial": "serial_string",
+              "model": "model_name",
+              "fw": "0.0.1"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "ok",
+                  "deviceId": "long-device-id"
+                }
+        500:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "fail",
+                  "message": "Internal error"
+                }
+        401:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "Not logged in"
+                }
+  /app:
+    post:
+      description: Register app
+      headers:
+        x-api-key:
+          example: longlongstring
+      body:
+        application/json:
+          schema: |
+            {
+              "type": "object",
+              "$schema": "http://json-schema.org/draft-03/schema",
+              "required": true,
+              "properties": {
+                "appVersion": {
+                  "type": "string",
+                  "required": true
+                },
+                "modelVersion": {
+                  "type": "string",
+                  "required": true
+                },
+                "modelName": {
+                  "type": "string",
+                  "required": true
+                }
+              }
+            }
+          example: |
+            {
+              "appVersion": "app_version",
+              "modelVersion": "model_version",
+              "modelName": "model_name"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "ok",
+                  "appId": "long-device-id"
+                }
+        500:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "fail",
+                  "message": "Internal error"
+                }
+        401:
+          body:
+            application/json:
+              example: |
+                {
+                  "status": "Not logged in"
+                }
